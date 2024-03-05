@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, *)
 public struct KSVideoPlayerView: View {
     private let subtitleDataSouce: SubtitleDataSouce?
-    @State
+    @Binding
     private var title: String
     @StateObject
     private var playerCoordinator: KSVideoPlayer.Coordinator
@@ -20,19 +20,19 @@ public struct KSVideoPlayerView: View {
     @FocusState
     private var focusableField: FocusableField?
     public let options: KSOptions
-    @State
-    public var url: URL {
-        didSet {
-            #if os(macOS)
-            NSDocumentController.shared.noteNewRecentDocumentURL(url)
-            #endif
-        }
-    }
+    @Binding
+    public var url: URL?
 
-    public init(coordinator: KSVideoPlayer.Coordinator = KSVideoPlayer.Coordinator(), url: URL, options: KSOptions, title: String? = nil, subtitleDataSouce: SubtitleDataSouce? = nil) {
-        _url = .init(initialValue: url)
+    public init(
+        coordinator: KSVideoPlayer.Coordinator = KSVideoPlayer.Coordinator(),
+        url: Binding<URL?>,
+        options: KSOptions = .init(),
+        title: Binding<String>? = nil,
+        subtitleDataSouce: SubtitleDataSouce? = nil
+    ) {
+        _url = url
         _playerCoordinator = .init(wrappedValue: coordinator)
-        _title = .init(initialValue: title ?? url.lastPathComponent)
+        _title = title ?? .constant(url.wrappedValue?.lastPathComponent ?? "")
         #if os(macOS)
         NSDocumentController.shared.noteNewRecentDocumentURL(url)
         #endif
@@ -42,7 +42,9 @@ public struct KSVideoPlayerView: View {
 
     public var body: some View {
         ZStack {
-            playView
+            if let url {
+                playView(url: url)
+            }
             VideoSubtitleView(model: playerCoordinator.subtitleModel)
             #if os(macOS)
             controllerView.opacity(playerCoordinator.isMaskShow ? 1 : 0)
@@ -74,7 +76,7 @@ public struct KSVideoPlayerView: View {
         #endif
     }
 
-    private var playView: some View {
+    private func playView(url: URL) -> some View {
         KSVideoPlayer(coordinator: playerCoordinator, url: url, options: options)
             .onStateChanged { playerLayer, state in
                 if state == .readyToPlay {
