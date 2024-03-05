@@ -699,7 +699,7 @@ public struct PlatformView<Content: View>: View {
 struct KSVideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         let url = URL(string: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")!
-        KSVideoPlayerView(url: url, options: KSOptions())
+        KSVideoPlayerView(url: .constant(url), options: KSOptions())
     }
 }
 
