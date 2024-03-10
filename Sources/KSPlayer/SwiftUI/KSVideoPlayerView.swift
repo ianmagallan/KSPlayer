@@ -205,8 +205,11 @@ public struct KSVideoPlayerView: View {
                 KSVideoPlayerViewBuilder.playbackControlView(config: playerCoordinator)
                 VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
                     .frame(width: playerWidth / 2)
-                KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
-                    .font(.largeTitle)
+                Group {
+                    KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
+                    KSVideoPlayerViewBuilder.subtitleButton(config: playerCoordinator)
+                }
+                .font(.largeTitle)
             }
             .buttonStyle(.plain)
                 .padding([.all], 24)
