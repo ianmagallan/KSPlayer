@@ -66,7 +66,9 @@ struct VideoControllerView: View {
                     audioButton(audioTracks: audioTracks)
                 }
                 muteButton
+                #if !os(xrOS)
                 contentModeButton
+                #endif
                 subtitleButton
             }
             #if !os(xrOS)
@@ -111,11 +113,7 @@ struct VideoControllerView: View {
     }
 
     private var contentModeButton: some View {
-        Button {
-            config.isScaleAspectFill.toggle()
-        } label: {
-            Image(systemName: config.isScaleAspectFill ? "rectangle.arrowtriangle.2.inward" : "rectangle.arrowtriangle.2.outward")
-        }
+        KSVideoPlayerViewBuilder.contentModeButton(config: config)
     }
 
     private func audioButton(audioTracks: [MediaPlayerTrack]) -> some View {

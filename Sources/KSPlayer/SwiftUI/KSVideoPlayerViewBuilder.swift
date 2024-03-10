@@ -10,7 +10,13 @@ import SwiftUI
 enum KSVideoPlayerViewBuilder {
     
     static func playbackControlView(config: KSVideoPlayer.Coordinator) -> some View {
-        HStack {
+        #if os(xrOS)
+        let spacing: CGFloat = 8
+        #else
+        let spacing: CGFloat = 0
+        #endif
+        
+        return HStack(spacing: spacing) {
             Spacer()
             if config.playerLayer?.player.seekable ?? false {
                 Button {
@@ -53,23 +59,32 @@ enum KSVideoPlayerViewBuilder {
         }
     }
     
-    private static var playSlashSystemName: String {
-        #if os(xrOS)
-        "play.slash"
-        #else
+    static func contentModeButton(config: KSVideoPlayer.Coordinator) -> some View {
+        Button {
+            config.isScaleAspectFill.toggle()
+        } label: {
+            Image(systemName: config.isScaleAspectFill ? "rectangle.arrowtriangle.2.inward" : "rectangle.arrowtriangle.2.outward")
+        }
+    }
+}
+
+// MARK: - Private functions
+
+private extension KSVideoPlayerViewBuilder {
+    
+    static var playSlashSystemName: String {
         "play.slash.fill"
-        #endif
     }
     
-    private static var playSystemName: String {
+    static var playSystemName: String {
         #if os(xrOS)
-        "play"
+        "play.fill"
         #else
         "play.circle.fill"
         #endif
     }
     
-    private static var pauseSystemName: String {
+    static var pauseSystemName: String {
         #if os(xrOS)
         "pause"
         #else
@@ -77,6 +92,9 @@ enum KSVideoPlayerViewBuilder {
         #endif
     }
 }
+
+
+// MARK: - EventModifiers
 
 private extension EventModifiers {
     static let none = Self()

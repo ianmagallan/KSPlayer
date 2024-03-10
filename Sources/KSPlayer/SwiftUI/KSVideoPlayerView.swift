@@ -201,10 +201,12 @@ public struct KSVideoPlayerView: View {
         }
         #if os(xrOS)
         .ornament(attachmentAnchor: .scene(.bottom)) {
-            HStack {
+            HStack(spacing: 16) {
                 KSVideoPlayerViewBuilder.playbackControlView(config: playerCoordinator)
                 VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
                     .frame(width: playerWidth / 2)
+                KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
+                    .font(.largeTitle)
             }
             .buttonStyle(.plain)
                 .padding([.all], 24)
