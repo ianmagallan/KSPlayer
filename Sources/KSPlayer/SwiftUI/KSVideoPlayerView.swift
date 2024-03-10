@@ -42,17 +42,19 @@ public struct KSVideoPlayerView: View {
 
     public var body: some View {
         ZStack {
-            if let url {
-                playView(url: url)
+            GeometryReader { proxy in
+                if let url {
+                    playView(url: url)
+                }
+                VideoSubtitleView(model: playerCoordinator.subtitleModel)
+                #if os(macOS)
+                controllerView.opacity(playerCoordinator.isMaskShow ? 1 : 0)
+                #else
+                if playerCoordinator.isMaskShow {
+                    controllerView(playerWidth: proxy.size.width)
+                }
+                #endif
             }
-            VideoSubtitleView(model: playerCoordinator.subtitleModel)
-            #if os(macOS)
-            controllerView.opacity(playerCoordinator.isMaskShow ? 1 : 0)
-            #else
-            if playerCoordinator.isMaskShow {
-                controllerView
-            }
-            #endif
         }
         .preferredColorScheme(.dark)
         .tint(.white)
@@ -189,12 +191,22 @@ public struct KSVideoPlayerView: View {
         #endif
     }
 
-    private var controllerView: some View {
+    private func controllerView(playerWidth: Double) -> some View {
         VStack {
             // 设置opacity为0，还是会去更新View。所以只能这样了
             VideoControllerView(config: playerCoordinator, subtitleModel: playerCoordinator.subtitleModel, title: $title)
+            #if !os(xrOS)
             VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+            #endif
         }
+        #if os(xrOS)
+        .ornament(attachmentAnchor: .scene(.bottom)) {
+            VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+                .frame(width: playerWidth / 2)
+                .padding([.all], 24)
+                .glassBackgroundEffect()
+        }
+        #endif
         .focused($focusableField, equals: .controller)
         .onAppear {
             focusableField = .controller
