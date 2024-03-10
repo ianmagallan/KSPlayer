@@ -86,6 +86,18 @@ enum KSVideoPlayerViewBuilder {
             Image(systemName: "text.bubble.fill")
         }
     }
+    
+    static func playbackRateButton(playbackRate: Binding<Float>) -> some View {
+        MenuView(selection: playbackRate) {
+            ForEach([0.5, 1.0, 1.25, 1.5, 2.0] as [Float]) { value in
+                // 需要有一个变量text。不然会自动帮忙加很多0
+                let text = "\(value) x"
+                Text(text).tag(value)
+            }
+        } label: {
+            Image(systemName: "gauge.with.dots.needle.67percent")
+        }
+    }
 }
 
 // MARK: - Private functions

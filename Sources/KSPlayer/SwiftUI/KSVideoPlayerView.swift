@@ -208,6 +208,7 @@ public struct KSVideoPlayerView: View {
                 Group {
                     KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
                     KSVideoPlayerViewBuilder.subtitleButton(config: playerCoordinator)
+                    KSVideoPlayerViewBuilder.playbackRateButton(playbackRate: $playerCoordinator.playbackRate)
                 }
                 .font(.largeTitle)
             }

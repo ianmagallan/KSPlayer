@@ -82,8 +82,8 @@ struct VideoControllerView: View {
                 ProgressView()
                     .opacity(config.state == .buffering ? 1 : 0)
                 Spacer()
-                playbackRateButton
                 #if !os(xrOS)
+                playbackRateButton
                 pipButton
                 infoButton
                 // iOS 模拟器加keyboardShortcut会导致KSVideoPlayer.Coordinator无法释放。真机不会有这个问题
@@ -137,15 +137,7 @@ struct VideoControllerView: View {
     }
 
     private var playbackRateButton: some View {
-        MenuView(selection: $config.playbackRate) {
-            ForEach([0.5, 1.0, 1.25, 1.5, 2.0] as [Float]) { value in
-                // 需要有一个变量text。不然会自动帮忙加很多0
-                let text = "\(value) x"
-                Text(text).tag(value)
-            }
-        } label: {
-            Image(systemName: "gauge.with.dots.needle.67percent")
-        }
+        KSVideoPlayerViewBuilder.playbackRateButton(playbackRate: $config.playbackRate)
     }
 
     private var pipButton: some View {
