@@ -69,49 +69,11 @@ struct VideoControllerView: View {
                 contentModeButton
                 subtitleButton
             }
+            #if !os(xrOS)
             Spacer()
-            HStack {
-                Spacer()
-                if config.playerLayer?.player.seekable ?? false {
-                    Button {
-                        config.skip(interval: -15)
-                    } label: {
-                        Image(systemName: "gobackward.15")
-                            .font(.largeTitle)
-                    }
-                    #if !os(tvOS)
-                    .keyboardShortcut(.leftArrow, modifiers: .none)
-                    #endif
-                }
-                Spacer()
-                Button {
-                    if config.state.isPlaying {
-                        config.playerLayer?.pause()
-                    } else {
-                        config.playerLayer?.play()
-                    }
-                } label: {
-                    Image(systemName: config.state == .error ? "play.slash.fill" : (config.state.isPlaying ? "pause.circle.fill" : "play.circle.fill"))
-                        .font(.largeTitle)
-                }
-                #if !os(tvOS)
-                .keyboardShortcut(.space, modifiers: .none)
-                #endif
-                Spacer()
-                if config.playerLayer?.player.seekable ?? false {
-                    Button {
-                        config.skip(interval: 15)
-                    } label: {
-                        Image(systemName: "goforward.15")
-                            .font(.largeTitle)
-                    }
-                    #if !os(tvOS)
-                    .keyboardShortcut(.rightArrow, modifiers: .none)
-                    #endif
-                }
-                Spacer()
-            }
+            KSVideoPlayerViewBuilder.playbackControlView(config: config)
             Spacer()
+            #endif
             HStack {
                 Text(title)
                     .font(.title3)
