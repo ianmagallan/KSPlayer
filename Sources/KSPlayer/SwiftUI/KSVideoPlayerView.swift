@@ -201,20 +201,7 @@ public struct KSVideoPlayerView: View {
         }
         #if os(xrOS)
         .ornament(attachmentAnchor: .scene(.bottom)) {
-            HStack(spacing: 16) {
-                KSVideoPlayerViewBuilder.playbackControlView(config: playerCoordinator)
-                VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
-                    .frame(width: playerWidth / 2)
-                Group {
-                    KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
-                    KSVideoPlayerViewBuilder.subtitleButton(config: playerCoordinator)
-                    KSVideoPlayerViewBuilder.playbackRateButton(playbackRate: $playerCoordinator.playbackRate)
-                }
-                .font(.largeTitle)
-            }
-            .buttonStyle(.plain)
-                .padding([.all], 24)
-                .glassBackgroundEffect()
+            bottomOrnamentView(playerWidth: playerWidth)
         }
         #endif
         .focused($focusableField, equals: .controller)
@@ -226,7 +213,31 @@ public struct KSVideoPlayerView: View {
         }
         .padding()
     }
-
+    
+    private func bottomOrnamentView(playerWidth: Double) -> some View {
+        VStack(alignment: .center) {
+            KSVideoPlayerViewBuilder.titleView(title: title, config: playerCoordinator)
+            playerControlsView(playerWidth: playerWidth)
+        }
+        .buttonStyle(.plain)
+            .padding([.all], 24)
+            .glassBackgroundEffect()
+    }
+    
+    private func playerControlsView(playerWidth: Double) -> some View {
+        HStack(spacing: 16) {
+            KSVideoPlayerViewBuilder.playbackControlView(config: playerCoordinator)
+            VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+                .frame(width: playerWidth / 2)
+            Group {
+                KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
+                KSVideoPlayerViewBuilder.subtitleButton(config: playerCoordinator)
+                KSVideoPlayerViewBuilder.playbackRateButton(playbackRate: $playerCoordinator.playbackRate)
+            }
+            .font(.largeTitle)
+        }
+    }
+    
     fileprivate enum FocusableField {
         case play, controller
     }

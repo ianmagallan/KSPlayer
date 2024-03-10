@@ -98,6 +98,15 @@ enum KSVideoPlayerViewBuilder {
             Image(systemName: "gauge.with.dots.needle.67percent")
         }
     }
+    
+    static func titleView(title: String, config: KSVideoPlayer.Coordinator) -> some View {
+        HStack {
+            Text(title)
+                .font(.title3)
+            ProgressView()
+                .opacity(config.state == .buffering ? 1 : 0)
+        }
+    }
 }
 
 // MARK: - Private functions

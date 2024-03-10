@@ -77,12 +77,9 @@ struct VideoControllerView: View {
             Spacer()
             #endif
             HStack {
-                Text(title)
-                    .font(.title3)
-                ProgressView()
-                    .opacity(config.state == .buffering ? 1 : 0)
+            #if !os(xrOS)
+                KSVideoPlayerViewBuilder.titleView(title: title, config: config)
                 Spacer()
-                #if !os(xrOS)
                 playbackRateButton
                 pipButton
                 infoButton
