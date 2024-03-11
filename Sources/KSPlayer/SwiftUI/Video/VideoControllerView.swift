@@ -75,6 +75,10 @@ struct VideoControllerView: View {
                 Spacer()
                 if let audioTracks = config.playerLayer?.player.tracks(mediaType: .audio), !audioTracks.isEmpty {
                     audioButton(audioTracks: audioTracks)
+                    #if os(xrOS)
+                        .aspectRatio(1, contentMode: .fit)
+                        .glassBackgroundEffect()
+                    #endif
                 }
                 muteButton
                 #if !os(xrOS)
@@ -145,6 +149,10 @@ struct VideoControllerView: View {
             }
         } label: {
             Image(systemName: "waveform.circle.fill")
+            #if os(xrOS)
+                .padding()
+                .clipShape(Circle())
+            #endif
         }
     }
 
