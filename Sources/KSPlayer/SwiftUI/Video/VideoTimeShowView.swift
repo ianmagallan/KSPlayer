@@ -33,6 +33,9 @@ struct VideoTimeShowView: View {
                     }
                 }
                 .frame(maxHeight: 20)
+                #if os(xrOS)
+                .tint(.white.opacity(0.8))
+                #endif
                 Text((model.totalTime).toString(for: .minOrHour))
                     .font(timeFont ?? .caption2.monospacedDigit())
             }

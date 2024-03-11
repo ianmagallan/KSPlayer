@@ -122,7 +122,8 @@ struct VideoControllerView: View {
                 .onChange(of: config.playbackVolume, { _, newValue in
                 config.isMuted = newValue == 0
             })
-                .frame(width: volumeSliderSize ?? 100)
+            .frame(width: volumeSliderSize ?? 100)
+            .tint(.white.opacity(0.8))
             KSVideoPlayerViewBuilder.muteButton(config: config)
         }
         .padding(16)
