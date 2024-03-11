@@ -227,12 +227,18 @@ public struct KSVideoPlayerView: View {
     private func playerControlsView(playerWidth: Double) -> some View {
         HStack(spacing: 16) {
             KSVideoPlayerViewBuilder.playbackControlView(config: playerCoordinator)
-            VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+            VideoTimeShowView(
+                config: playerCoordinator,
+                model: playerCoordinator.timemodel,
+                timeFont: .title3.monospacedDigit()
+            )
                 .frame(width: playerWidth / 2)
-            Group {
+            HStack {
+                Spacer()
                 KSVideoPlayerViewBuilder.contentModeButton(config: playerCoordinator)
                 KSVideoPlayerViewBuilder.subtitleButton(config: playerCoordinator)
                 KSVideoPlayerViewBuilder.playbackRateButton(playbackRate: $playerCoordinator.playbackRate)
+                Spacer()
             }
             .font(.largeTitle)
         }

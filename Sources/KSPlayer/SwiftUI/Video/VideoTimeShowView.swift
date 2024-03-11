@@ -13,12 +13,14 @@ struct VideoTimeShowView: View {
     var config: KSVideoPlayer.Coordinator
     @ObservedObject
     var model: ControllerTimeModel
+    var timeFont: Font?
     public var body: some View {
         if config.timemodel.totalTime == 0 {
             Text("Live Streaming")
         } else {
             HStack {
-                Text(model.currentTime.toString(for: .minOrHour)).font(.caption2.monospacedDigit())
+                Text(model.currentTime.toString(for: .minOrHour))
+                    .font(timeFont ?? .caption2.monospacedDigit())
                 Slider(value: Binding {
                     Double(model.currentTime)
                 } set: { newValue, _ in
@@ -31,7 +33,8 @@ struct VideoTimeShowView: View {
                     }
                 }
                 .frame(maxHeight: 20)
-                Text((model.totalTime).toString(for: .minOrHour)).font(.caption2.monospacedDigit())
+                Text((model.totalTime).toString(for: .minOrHour))
+                    .font(timeFont ?? .caption2.monospacedDigit())
             }
             .font(.system(.title2))
         }
