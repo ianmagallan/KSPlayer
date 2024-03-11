@@ -40,6 +40,9 @@ enum KSVideoPlayerViewBuilder {
                 Image(systemName: config.state == .error ? playSlashSystemName : (config.state.isPlaying ? pauseSystemName : playSystemName))
                     .font(.largeTitle)
             }
+            #if os(xrOS)
+            .contentTransition(.symbolEffect(.replace))
+            #endif
             #if !os(tvOS)
             .keyboardShortcut(.space, modifiers: .none)
             #endif
@@ -136,7 +139,7 @@ private extension KSVideoPlayerViewBuilder {
     
     static var pauseSystemName: String {
         #if os(xrOS)
-        "pause"
+        "pause.fill"
         #else
         "pause.circle.fill"
         #endif
