@@ -15,6 +15,8 @@ struct VideoControllerView: View {
     var subtitleModel: SubtitleModel
     @Binding
     var title: String
+    var volumeSliderSize: Double?
+    
     @State
     private var showVideoSetting = false
     @Environment(\.dismiss)
@@ -110,12 +112,20 @@ struct VideoControllerView: View {
     }
 
     private var muteButton: some View {
-        Button {
-            config.isMuted.toggle()
-        } label: {
-            Image(systemName: config.isMuted ? "speaker.slash.circle.fill" : "speaker.wave.2.circle.fill")
+        #if os(xrOS)
+        HStack {
+            Slider(value: $config.playbackVolume, in: 0...1)
+                .onChange(of: config.playbackVolume, { _, newValue in
+                config.isMuted = newValue == 0
+            })
+                .frame(width: volumeSliderSize ?? 100)
+            KSVideoPlayerViewBuilder.muteButton(config: config)
         }
-        .shadow(color: .black, radius: 1)
+        .padding(16)
+        .glassBackgroundEffect()
+        #else
+        KSVideoPlayerViewBuilder.muteButton(config: config)
+        #endif
     }
 
     private var contentModeButton: some View {

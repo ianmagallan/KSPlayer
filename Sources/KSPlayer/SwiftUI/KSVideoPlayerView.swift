@@ -203,7 +203,12 @@ public struct KSVideoPlayerView: View {
     private func controllerView(playerWidth: Double) -> some View {
         VStack {
             // 设置opacity为0，还是会去更新View。所以只能这样了
-            VideoControllerView(config: playerCoordinator, subtitleModel: playerCoordinator.subtitleModel, title: $title)
+            VideoControllerView(
+                config: playerCoordinator,
+                subtitleModel: playerCoordinator.subtitleModel,
+                title: $title,
+                volumeSliderSize: playerWidth / 6
+            )
             #if !os(xrOS)
             VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
             #endif
