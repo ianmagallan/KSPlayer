@@ -46,7 +46,16 @@ public struct KSVideoPlayerView: View {
                 if let url {
                     playView(url: url)
                 }
+                #if os(xrOS)
+                HStack {
+                    Spacer()
+                    VideoSubtitleView(model: playerCoordinator.subtitleModel)
+                    Spacer()
+                }
+                .padding([.bottom], 24)
+                #else
                 VideoSubtitleView(model: playerCoordinator.subtitleModel)
+                #endif
                 #if os(macOS)
                 controllerView.opacity(playerCoordinator.isMaskShow ? 1 : 0)
                 #else
