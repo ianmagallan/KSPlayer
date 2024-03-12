@@ -53,20 +53,22 @@ struct VideoControllerView: View {
             }
             #else
             HStack {
-                Button {
-                    dismiss()
-                } label: {
+                if config.hasCloseButton {
+                    Button {
+                        dismiss()
+                    } label: {
+                        #if os(xrOS)
+                        Image(systemName: "xmark")
+                        #else
+                        Image(systemName: "x.circle.fill")
+                        #endif
+                    }
                     #if os(xrOS)
-                    Image(systemName: "xmark")
-                    #else
-                    Image(systemName: "x.circle.fill")
+                    .frame(width: 35, height: 35)
+                    .padding(8)
+                    .glassBackgroundEffect()
                     #endif
                 }
-                #if os(xrOS)
-                .frame(width: 35, height: 35)
-                .padding(8)
-                .glassBackgroundEffect()
-                #endif
                 #if !os(tvOS) && !os(xrOS)
                 if config.playerLayer?.player.allowsExternalPlayback == true {
                     AirPlayView().fixedSize()

@@ -143,6 +143,8 @@ extension KSVideoPlayer: UIViewRepresentable {
                 }
             }
         }
+        
+        public var hasCloseButton: Bool = true
 
         public var subtitleModel = SubtitleModel()
         public var timemodel = ControllerTimeModel()
