@@ -9,6 +9,7 @@ import SwiftUI
 
 enum KSVideoPlayerViewBuilder {
     
+    @MainActor
     static func playbackControlView(config: KSVideoPlayer.Coordinator) -> some View {
         #if os(xrOS)
         let spacing: CGFloat = 8
@@ -62,6 +63,7 @@ enum KSVideoPlayerViewBuilder {
         }
     }
     
+    @MainActor
     static func contentModeButton(config: KSVideoPlayer.Coordinator) -> some View {
         Button {
             config.isScaleAspectFill.toggle()
@@ -70,6 +72,7 @@ enum KSVideoPlayerViewBuilder {
         }
     }
     
+    @MainActor
     static func subtitleButton(config: KSVideoPlayer.Coordinator) -> some View {
         MenuView(selection: Binding {
             config.subtitleModel.selectedSubtitleInfo?.subtitleID
@@ -102,6 +105,7 @@ enum KSVideoPlayerViewBuilder {
         }
     }
     
+    @MainActor
     static func titleView(title: String, config: KSVideoPlayer.Coordinator) -> some View {
         HStack {
             Text(title)
@@ -111,6 +115,7 @@ enum KSVideoPlayerViewBuilder {
         }
     }
     
+    @MainActor
     static func muteButton(config: KSVideoPlayer.Coordinator) -> some View {
         Button {
             config.isMuted.toggle()

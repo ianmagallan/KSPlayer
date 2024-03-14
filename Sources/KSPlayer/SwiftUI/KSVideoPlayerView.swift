@@ -18,13 +18,24 @@ public struct KSVideoPlayerView: View {
     @Environment(\.dismiss)
     private var dismiss
     @FocusState
-    private var focusableField: FocusableField?
+    private var focusableField: FocusableField? {
+         willSet {
+             isDropdownShow = newValue == .info
+         }
+     }
+
     public let options: KSOptions
+    @State
+    private var isDropdownShow = false
     @Binding
     public var url: URL?
 
+    public init(url: URL, options: KSOptions, title: String? = nil, subtitleDataSouce: SubtitleDataSouce? = nil) {
+        self.init(coordinator: KSVideoPlayer.Coordinator(), url: .constant(url), options: options, title: .constant(title ?? ""), subtitleDataSouce: subtitleDataSouce)
+    }
+    
     public init(
-        coordinator: KSVideoPlayer.Coordinator = KSVideoPlayer.Coordinator(),
+        coordinator: KSVideoPlayer.Coordinator,
         url: Binding<URL?>,
         options: KSOptions = .init(),
         title: Binding<String>? = nil,
@@ -56,11 +67,11 @@ public struct KSVideoPlayerView: View {
                 #else
                 VideoSubtitleView(model: playerCoordinator.subtitleModel)
                 #endif
-                #if os(macOS)
-                controllerView.opacity(playerCoordinator.isMaskShow ? 1 : 0)
-                #else
-                if playerCoordinator.isMaskShow {
-                    controllerView(playerWidth: proxy.size.width)
+                controllerView(playerWidth: proxy.size.width)
+                #if os(tvOS)
+                if isDropdownShow {
+                        VideoSettingView(config: playerCoordinator, subtitleModel: playerCoordinator.subtitleModel, subtitleTitle: title)
+                                    .focused($focusableField, equals: .info)
                 }
                 #endif
             }
@@ -81,7 +92,12 @@ public struct KSVideoPlayerView: View {
                 if playerCoordinator.isMaskShow {
                     playerCoordinator.isMaskShow = false
                 } else {
-                    dismiss()
+                    switch focusableField {
+                    case .play:
+                        dismiss()
+                    default:
+                        focusableField = .play
+                    }
                 }
             }
         #endif
@@ -143,7 +159,7 @@ public struct KSVideoPlayerView: View {
         #endif
         #if os(macOS)
             .onTapGesture(count: 2) {
-                guard let view = playerCoordinator.playerLayer else {
+                guard let view = playerCoordinator.playerLayer?.player.view else {
                     return
                 }
                 view.window?.toggleFullScreen(nil)
@@ -151,7 +167,7 @@ public struct KSVideoPlayerView: View {
                 view.layoutSubtreeIfNeeded()
         }
         .onExitCommand {
-            playerCoordinator.playerLayer?.exitFullScreenMode()
+            playerCoordinator.playerLayer?.player.view?.exitFullScreenMode()
         }
         .onMoveCommand { direction in
             switch direction {
@@ -179,8 +195,10 @@ public struct KSVideoPlayerView: View {
                 playerCoordinator.skip(interval: -15)
             case .right:
                 playerCoordinator.skip(interval: 15)
-            case .up, .down:
+            case .up:
                 playerCoordinator.isMaskShow.toggle()
+            case .down:
+                focusableField = .info
             @unknown default:
                 break
             }
@@ -209,9 +227,18 @@ public struct KSVideoPlayerView: View {
                 title: $title,
                 volumeSliderSize: playerWidth / 6
             )
+            // 设置opacity为0，还是会去更新View。所以只能这样了
+            if playerCoordinator.isMaskShow {
             #if !os(xrOS)
-            VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+                VideoTimeShowView(config: playerCoordinator, model: playerCoordinator.timemodel)
+                    .onAppear {
+                        focusableField = .controller
+                    }
+                    .onDisappear {
+                        focusableField = .play
+                    }
             #endif
+            }
         }
         #if os(xrOS)
         .ornament(attachmentAnchor: .scene(.bottom)) {
@@ -219,12 +246,7 @@ public struct KSVideoPlayerView: View {
         }
         #endif
         .focused($focusableField, equals: .controller)
-        .onAppear {
-            focusableField = .controller
-        }
-        .onDisappear {
-            focusableField = .play
-        }
+        .opacity(playerCoordinator.isMaskShow ? 1 : 0)
         .padding()
     }
     
@@ -259,11 +281,11 @@ public struct KSVideoPlayerView: View {
     }
     
     fileprivate enum FocusableField {
-        case play, controller
+        case play, controller, info
     }
 
     public func openURL(_ url: URL) {
-        runInMainqueue {
+        runOnMainThread {
             if url.isAudio || url.isMovie {
                 self.url = url
             } else {
@@ -313,7 +335,7 @@ extension View {
 struct KSVideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         let url = URL(string: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")!
-        KSVideoPlayerView(url: .constant(url), options: KSOptions())
+        KSVideoPlayerView(coordinator: KSVideoPlayer.Coordinator(), url: .constant(url), options: KSOptions())
     }
 }
 

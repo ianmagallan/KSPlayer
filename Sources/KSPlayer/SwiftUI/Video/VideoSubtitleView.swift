@@ -36,6 +36,7 @@ struct VideoSubtitleView: View {
 
 private extension SubtitlePart {
     @available(iOS 16, tvOS 16, macOS 13, *)
+    @MainActor
     var subtitleView: some View {
         VStack {
             if let image {
