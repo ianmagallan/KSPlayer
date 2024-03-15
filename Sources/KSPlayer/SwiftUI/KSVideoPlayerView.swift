@@ -241,7 +241,7 @@ public struct KSVideoPlayerView: View {
             }
         }
         #if os(xrOS)
-        .ornament(attachmentAnchor: .scene(.bottom)) {
+        .ornament(visibility: playerCoordinator.isMaskShow ? .visible : .hidden, attachmentAnchor: .scene(.bottom)) {
             bottomOrnamentView(playerWidth: playerWidth)
         }
         #endif
