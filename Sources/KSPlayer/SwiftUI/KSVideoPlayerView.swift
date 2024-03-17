@@ -11,7 +11,7 @@ import SwiftUI
 @available(iOS 16.0, macOS 13.0, tvOS 16.0, *)
 public struct KSVideoPlayerView: View {
     private let subtitleDataSouce: SubtitleDataSouce?
-    @State
+    @Binding
     private var title: String
     @StateObject
     private var playerCoordinator: KSVideoPlayer.Coordinator
@@ -29,9 +29,12 @@ public struct KSVideoPlayerView: View {
     private var isDropdownShow = false
     @State
     private var showVideoSetting = false
-    @State
-    public var url: URL {
+    @Binding
+    public var url: URL? {
         didSet {
+            guard let url else {
+                return
+            }
             #if os(macOS)
             NSDocumentController.shared.noteNewRecentDocumentURL(url)
             #endif
@@ -39,13 +42,13 @@ public struct KSVideoPlayerView: View {
     }
 
     public init(url: URL, options: KSOptions, title: String? = nil, subtitleDataSouce: SubtitleDataSouce? = nil) {
-        self.init(coordinator: KSVideoPlayer.Coordinator(), url: url, options: options, title: title, subtitleDataSouce: subtitleDataSouce)
+        self.init(coordinator: KSVideoPlayer.Coordinator(), url: .constant(url), options: options, title: .constant(title ?? ""), subtitleDataSouce: subtitleDataSouce)
     }
 
-    public init(coordinator: KSVideoPlayer.Coordinator, url: URL, options: KSOptions, title: String? = nil, subtitleDataSouce: SubtitleDataSouce? = nil) {
-        _url = .init(initialValue: url)
+    public init(coordinator: KSVideoPlayer.Coordinator, url: Binding<URL?>, options: KSOptions, title: Binding<String>? = nil, subtitleDataSouce: SubtitleDataSouce? = nil) {
+        _url = url
         _playerCoordinator = .init(wrappedValue: coordinator)
-        _title = .init(initialValue: title ?? url.lastPathComponent)
+        _title = title ?? .constant(url.wrappedValue?.lastPathComponent ?? "")
         #if os(macOS)
         NSDocumentController.shared.noteNewRecentDocumentURL(url)
         #endif
@@ -56,24 +59,26 @@ public struct KSVideoPlayerView: View {
     public var body: some View {
         ZStack {
             GeometryReader { proxy in
-                playView
-                #if os(xrOS)
-                HStack {
-                    Spacer()
+                if let url {
+                    playView(url: url)
+                    #if os(xrOS)
+                    HStack {
+                        Spacer()
+                        VideoSubtitleView(model: playerCoordinator.subtitleModel)
+                        Spacer()
+                    }
+                    .padding()
+                    #else
                     VideoSubtitleView(model: playerCoordinator.subtitleModel)
-                    Spacer()
+                    #endif
+                    controllerView(playerWidth: proxy.size.width)
+                    #if os(tvOS)
+                    if isDropdownShow {
+                        VideoSettingView(config: playerCoordinator, subtitleModel: playerCoordinator.subtitleModel, subtitleTitle: title)
+                            .focused($focusableField, equals: .info)
+                    }
+                    #endif
                 }
-                .padding()
-                #else
-                VideoSubtitleView(model: playerCoordinator.subtitleModel)
-                #endif
-                controllerView(playerWidth: proxy.size.width)
-                #if os(tvOS)
-                if isDropdownShow {
-                    VideoSettingView(config: playerCoordinator, subtitleModel: playerCoordinator.subtitleModel, subtitleTitle: title)
-                        .focused($focusableField, equals: .info)
-                }
-                #endif
             }
         }
         .preferredColorScheme(.dark)
@@ -103,7 +108,7 @@ public struct KSVideoPlayerView: View {
         #endif
     }
 
-    private var playView: some View {
+    private func playView(url: URL) -> some View {
         KSVideoPlayer(coordinator: playerCoordinator, url: url, options: options)
             .onStateChanged { playerLayer, state in
                 if state == .readyToPlay {
@@ -730,7 +735,7 @@ public struct PlatformView<Content: View>: View {
 struct KSVideoPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         let url = URL(string: "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")!
-        KSVideoPlayerView(coordinator: KSVideoPlayer.Coordinator(), url: url, options: KSOptions())
+        KSVideoPlayerView(coordinator: KSVideoPlayer.Coordinator(), url: .constant(url), options: KSOptions())
     }
 }
 
