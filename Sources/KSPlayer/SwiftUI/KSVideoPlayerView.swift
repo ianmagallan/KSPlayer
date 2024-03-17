@@ -50,7 +50,9 @@ public struct KSVideoPlayerView: View {
         _playerCoordinator = .init(wrappedValue: coordinator)
         _title = title ?? .constant(url.wrappedValue?.lastPathComponent ?? "")
         #if os(macOS)
-        NSDocumentController.shared.noteNewRecentDocumentURL(url)
+        if let url = url.wrappedValue {
+            NSDocumentController.shared.noteNewRecentDocumentURL(url)
+        }
         #endif
         self.options = options
         self.subtitleDataSouce = subtitleDataSouce
@@ -61,16 +63,12 @@ public struct KSVideoPlayerView: View {
             GeometryReader { proxy in
                 if let url {
                     playView(url: url)
-                    #if os(xrOS)
                     HStack {
                         Spacer()
                         VideoSubtitleView(model: playerCoordinator.subtitleModel)
                         Spacer()
                     }
                     .padding()
-                    #else
-                    VideoSubtitleView(model: playerCoordinator.subtitleModel)
-                    #endif
                     controllerView(playerWidth: proxy.size.width)
                     #if os(tvOS)
                     if isDropdownShow {
